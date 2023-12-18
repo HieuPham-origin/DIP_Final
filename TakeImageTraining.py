@@ -11,6 +11,5 @@ ret, thresh = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY_INV)
 
 # mask_bgr = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
 cv2.imwrite("1.jpg",thresh)
-cv2.waitKey(0) 
-
+cv2.waitKey(0)
 cv2.destroyAllWindows() 

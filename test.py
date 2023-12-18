@@ -39,4 +39,6 @@ for cnt in contours:
 cv2.imshow('im', im)
 cv2.imshow('out', out)
 cv2.imwrite('result.jpg', im)
+cv2.imwrite('result_out.jpg', out)
+
 cv2.waitKey(0)
