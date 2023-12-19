@@ -26,6 +26,9 @@ cv2.imwrite('Stacked.jpg', stacked_image)
 
 
 im = cv2.imread('1.jpg')
+cv2.imshow('cc', im)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 im3 = im.copy()
 
 gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)

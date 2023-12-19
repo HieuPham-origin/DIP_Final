@@ -36,12 +36,15 @@ class Training:
         # mask_bgr = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
         cv2.imwrite("1.jpg",thresh)
         return thresh
-    def train(self, stack):
-        im3 = stack.copy()
+    def train(self, im):
+        im3 = im.copy()
 
-        # gray = cv2.cvtColor(stack, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(stack, (5, 5), 0)
+        gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
         thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
+
+        #################      Now finding Contours         ###################
+
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         samples = np.empty((0, 100), np.float32)
@@ -55,10 +58,10 @@ class Training:
 
                 if h > 48:
 
-                    cv2.rectangle(stack, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                    cv2.rectangle(im, (x, y), (x + w, y + h), (255, 0, 0), 2)
                     roi = thresh[y:y + h, x:x + w]
                     roismall = cv2.resize(roi, (10, 10))
-                    cv2.imshow('norm', stack)
+                    cv2.imshow('norm', im)
                     key = cv2.waitKey(0)
 
                     if key == 27:  # (escape to quit)
@@ -67,13 +70,22 @@ class Training:
                         responses.append(int(chr(key)))
                         sample = roismall.reshape((1, 100))
                         samples = np.append(samples, sample, 0)
-                    cv2.rectangle(stack, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                    cv2.rectangle(im, (x, y), (x + w, y + h), (0, 0, 255), 2)
         responses = np.array(responses, np.float32)
         responses = responses.reshape((responses.size, 1))
         print ("training complete")
-        cv2.imwrite("train_result.png", stack)
+        cv2.imwrite("train_result.png", im)
         np.savetxt('generalsamples.data', samples)
         np.savetxt('generalresponses.data', responses)
+    
+train_model = Training(stacked_image)
+p = train_model.training_img
+cv2.imshow('hahaa', p)
+stack = train_model.preprocessingStackImage()
+cv2.imshow('hi', stack)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+training_img = train_model.train(stack)
 class DetectStudentNumber:
     def __init__(self, image_path, train_img):
         self.image_path = image_path
@@ -84,10 +96,3 @@ class DetectStudentNumber:
         return None
 # arr1 = np.array([223, 225, 233])
 # arr2 = np.array([123, 456, 789])
-    
-train_model = Training(stacked_image)
-stack = train_model.preprocessingStackImage()
-cv2.imshow('hi', stack)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-training_img = train_model.train(stack)
