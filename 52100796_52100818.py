@@ -82,13 +82,13 @@ class CheckWithKNN:
         self.responses = responses
         self.model = cv2.ml.KNearest_create()
     def trainModel(self):
-        return self.model.train(self.samples, cv2.ml.ROW_SAMPLE, self.responses)
+        self.model.train(self.samples, cv2.ml.ROW_SAMPLE, self.responses)
     def preprocess_image(self, image_path):
         input_image = cv2.imread(image_path)
         kernel = np.ones((5,5),np.uint8)
         hsv_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2HSV)
         lower_orange = (0, 0, 0)  # Lower HSV values for star color
-        upper_orage = (179, 255,70)   # Upper HSV values for star color
+        upper_orage = (179, 255,92)   # Upper HSV values for star color
 
         mask = cv2.inRange(hsv_image, lower_orange, upper_orage)
         ret, thresh = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY_INV)
@@ -98,7 +98,7 @@ class CheckWithKNN:
         cv2.waitKey(0) 
         cv2.destroyAllWindows() 
     def extractInformation(self, image_path):
-        model = self.trainModel()
+        self.trainModel()
         imSize = cv2.imread('52100796.jpg')
         self.preprocess_image(image_path)
         im = cv2.imread('1.jpg')
@@ -151,4 +151,4 @@ samples = np.loadtxt('generalsamples.data', np.float32)
 responses = np.loadtxt('generalresponses.data', np.float32)
 responses = responses.reshape((responses.size, 1))
 test = CheckWithKNN(samples, responses)
-test.extractInformation('52100796.jpg')
+test.extractInformation('52100832.jpg')
