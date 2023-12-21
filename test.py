@@ -13,12 +13,12 @@ model = cv2.ml.KNearest_create()
 model.train(samples, cv2.ml.ROW_SAMPLE, responses)
 
 ############################# testing part  #########################
-im2 = cv2.imread('2.jpg')
+# im2 = cv2.imread('2.jpg')
+imSize = cv2.imread('52100796.jpg')
+im = cv2.imread('3.jpg')
+im3 = cv2.imread('52100846.jpg')
 
-im = cv2.imread('2.jpg')
-im3 = cv2.imread('52100796.jpg')
-
-height, width = im.shape[:2]
+height, width = imSize.shape[:2]
 im = cv2.resize(im, (width//2,height//2))
 im3 = cv2.resize(im3, (width//2,height//2))
 
@@ -34,21 +34,26 @@ for cnt in contours:
         [x, y, w, h] = cv2.boundingRect(cnt)
         if h > 19 and h<30 and w >12:
             # cv2.rectangle(im, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            # cv2.rectangle(im3, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
+            
             roi = thresh[y:y + h, x:x + w]
             roismall = cv2.resize(roi, (10, 10))
             roismall = roismall.reshape((1, 100))
             roismall = np.float32(roismall)
             retval, results, neigh_resp, dists = model.findNearest(roismall, k=1)
-            # string = str(results[0][0])
+            # cv2.rectangle(im3, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # string = str(chr(int(results[0][0])))
             # cv2.putText(out, string, (x, y + h), 0, 1, (0, 255, 0))
-            if(int((results[0][0]))>47 and int((results[0][0]))<59 and y>=472 and y<475):
+            
+            if(int((results[0][0]))>47 and int((results[0][0]))<59):
                 print(y)
-                cv2.rectangle(im3, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                if (y>500 and x<450) == False:
+                    cv2.rectangle(im3, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                
+
+                if y>=450 and y<475 and x<450:
                 # int(chr(int((results[0][0]))))
-                string = str(int(chr(int((results[0][0])))))
-                cv2.putText(out, string, (x, y + h), 0, 1, (0, 255, 0))
+                    string = str(chr(int(results[0][0])))
+                    cv2.putText(out, string, (x, y + h), 0, 1, (0, 255, 0))
 
 
 cv2.imshow('im', im3)
