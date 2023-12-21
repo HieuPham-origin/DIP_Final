@@ -13,10 +13,14 @@ model = cv2.ml.KNearest_create()
 model.train(samples, cv2.ml.ROW_SAMPLE, responses)
 
 ############################# testing part  #########################
+im2 = cv2.imread('2.jpg')
 
 im = cv2.imread('2.jpg')
+im3 = cv2.imread('52100796.jpg')
+
 height, width = im.shape[:2]
 im = cv2.resize(im, (width//2,height//2))
+im3 = cv2.resize(im3, (width//2,height//2))
 
 print(im.shape)
 out = np.zeros(im.shape, np.uint8)
@@ -28,20 +32,26 @@ contours, hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_S
 for cnt in contours:
     if cv2.contourArea(cnt) > 100  and cv2.contourArea(cnt) < 480:
         [x, y, w, h] = cv2.boundingRect(cnt)
-        if h > 20 and h<30 and w<30:
+        if h > 19 and h<30 and w >12:
             # cv2.rectangle(im, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # cv2.rectangle(im3, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
             roi = thresh[y:y + h, x:x + w]
             roismall = cv2.resize(roi, (10, 10))
             roismall = roismall.reshape((1, 100))
             roismall = np.float32(roismall)
             retval, results, neigh_resp, dists = model.findNearest(roismall, k=1)
-            if(int((results[0][0]))>47 and int((results[0][0]))<59 ):
-                cv2.rectangle(im, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # string = str(results[0][0])
+            # cv2.putText(out, string, (x, y + h), 0, 1, (0, 255, 0))
+            if(int((results[0][0]))>47 and int((results[0][0]))<59 and y>=472 and y<475):
+                print(y)
+                cv2.rectangle(im3, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 # int(chr(int((results[0][0]))))
                 string = str(int(chr(int((results[0][0])))))
                 cv2.putText(out, string, (x, y + h), 0, 1, (0, 255, 0))
 
-cv2.imshow('im', im)
+
+cv2.imshow('im', im3)
 cv2.imshow('out', out)
 # cv2.imwrite('result.jpg', im)
 # cv2.imwrite('result_out.jpg', out)
