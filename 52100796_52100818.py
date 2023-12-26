@@ -66,25 +66,25 @@ class CheckWithKNN:
     def trainModel(self):
         self.model = cv2.ml.KNearest_create()
         self.model.train(self.samples, cv2.ml.ROW_SAMPLE, self.responses)
-    def preprocess_image(self, image_path, value):
+    def preprocess_image(self, image_path):
         input_image = cv2.imread(image_path)
         hsv_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2HSV)
         lower_range = (0, 0, 0)  # Lower HSV values
-        upper_range = (179, 255, value)   # Upper HSV values
+        upper_range = (179, 255, 92)   # Upper HSV values
         mask = cv2.inRange(hsv_image, lower_range, upper_range)
         ret, thresh = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY_INV)
         cv2.imwrite("1.jpg",thresh)
         return  
-    def extractInformation(self, image_path, value):
+    def extractInformation(self, image_path):
         self.trainModel()
-        self.preprocess_image(image_path, value)
+        self.preprocess_image(image_path)
         studentID = image_path.split('.')[0]
-        im = cv2.imread('1.jpg')
-        im3 = cv2.imread(image_path)
-        im = cv2.resize(im, (1149, 726))
-        im3 = cv2.resize(im3, (1149, 726))
-        out = np.zeros(im.shape, np.uint8)
-        gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        gray_img = cv2.imread('1.jpg')
+        img_original = cv2.imread(image_path)
+        gray_img = cv2.resize(gray_img, (1149, 726))
+        img_original = cv2.resize(img_original, (1149, 726))
+        out = np.zeros(gray_img.shape, np.uint8)
+        gray = cv2.cvtColor(gray_img, cv2.COLOR_BGR2GRAY)
         thresh = cv2.adaptiveThreshold(gray, 255, 1, 1, 11, 2)
 
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
@@ -100,13 +100,13 @@ class CheckWithKNN:
                     retval, results, neigh_resp, dists = self.model.findNearest(roismall, k=1)
                     if(int((results[0][0]))>47 and int((results[0][0]))<59) and y> 200:
                         if (y>500 and x<450) == False:
-                            cv2.rectangle(im3, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            cv2.rectangle(img_original, (x, y), (x + w, y + h), (0, 255, 0), 2)
                         # extract StudentID
                         if y>=450 and y<475 and x<450:
                         # int(chr(int((results[0][0]))))
                             string = str(chr(int(results[0][0])))
                             cv2.putText(out, string, (x, y + h), 0, 1, (0, 255, 0))
-        cv2.imwrite(f'result_{studentID}.jpg', im3)
+        cv2.imwrite(f'result_{studentID}.jpg', img_original)
         cv2.imwrite(f'result_studentID_{studentID}.jpg', out)
         return
 # test
@@ -114,8 +114,8 @@ samples = np.loadtxt('generalsamples.data', np.float32)
 responses = np.loadtxt('generalresponses.data', np.float32)
 responses = responses.reshape((responses.size, 1))
 test = CheckWithKNN(samples, responses)
-test.extractInformation('52100796.jpg', 102)
-test.extractInformation('52100104.jpg', 89)
-test.extractInformation('52100832.jpg', 82)
-test.extractInformation('52100018.jpg', 92)
-test.extractInformation('52100570.jpg', 92)
+test.extractInformation('52100796.jpg')
+test.extractInformation('52100104.jpg')
+test.extractInformation('52100832.jpg')
+test.extractInformation('52100018.jpg')
+test.extractInformation('52100570.jpg')
